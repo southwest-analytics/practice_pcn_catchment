@@ -2,8 +2,12 @@ library(tidyverse)
 library(readxl)
 
 # 1. File locations ----
+# **********************
+
+# This section needs to be adjusted to point to the correct location for the user
 
 # * 1.1. GP registration data ----
+# The GP registration data is in a zipfile and we will use just the 'all' gender file 
 gp_registration_zipfile <- './data/gp-reg-pat-prac-lsoa-male-female-July-23.zip'
 gp_registration_file <- 'gp-reg-pat-prac-lsoa-all.csv'
 
@@ -11,32 +15,41 @@ gp_registration_file <- 'gp-reg-pat-prac-lsoa-all.csv'
 lookup_file <- './data/gp-reg-pat-prac-map.csv'
 
 # * 1.3. PCN data ----
+# The PCN data is in a zipfile and we will use the excel workbook and the PCNDetails worksheet
 pcn_zipfile <- './data/ePCN.zip'
 pcn_file <- 'ePCN.xlsx'
 pcn_sheet <- 'PCNDetails'
 
 # * 1.4. Postcode data ----
+# The postcode file is in a zipfile and we will use the ONSPD_MAY_2023_UK.csv file in the Data sub-directory
 postcode_zipfile <- './data/ONSPD_MAY_2023_UK.zip'
 postcode_file <- 'Data/ONSPD_MAY_2023_UK.csv'
 
 # 2. Read data ----
 
 # * 2.1. GP registration data ----
+# Read in the data keeping just the PRACTICE_CODE, LSOA_CODE and NUMBER_OF_PATIENTS fields and filter
+# for English LSOAs only (beginning with E)
 df_reg_popn <- read.csv(unzip(zipfile = gp_registration_zipfile, files = gp_registration_file)) %>%
   select(3, 5, 7) %>% 
   filter(grepl('^E', LSOA_CODE))
 
 # * 2.2. Lookup data ----
+# Read in the data keeping all fields apart from PUBLICATION and EXTRACT_DATE
 df_lu <- read.csv(lookup_file) %>% 
   select(-c(1:2))
 
 # * 2.3. PCN data ----
+# Read in the PCN data and filter out any entries with a Close Date 
+# and keeping just the PCN Code and Postcode fields
 df_pcn <- read_excel(path = unzip(zipfile = pcn_zipfile, files = pcn_file),
                    sheet = pcn_sheet) %>% 
   filter(is.na(`Close Date`)) %>%
   select(1, 12)
 
 # * 2.4. Postcode data ----
+# Read in the postcode data and keep just the pcds, oa11, lsoa11, 
+# oa21, lsoa21, lat and long fields
 df_postcode <- read.csv(unzip(zipfile = postcode_zipfile, files = postcode_file)) %>% 
   select(3, 34, 35, 51, 52, 43, 44)
 
