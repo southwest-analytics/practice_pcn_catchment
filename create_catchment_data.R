@@ -8,7 +8,7 @@ library(readxl)
 
 # * 1.1. GP registration data ----
 # The GP registration data is in a zipfile and we will use just the 'all' gender file 
-gp_registration_zipfile <- './data/gp-reg-pat-prac-lsoa-male-female-July-23.zip'
+gp_registration_zipfile <- './data/gp-reg-pat-prac-lsoa-male-female-Jan-24.zip'
 gp_registration_file <- 'gp-reg-pat-prac-lsoa-all.csv'
 
 # * 1.2. Practice, PCN, Sub-ICB, ICB, NHSE Region lookup ----
@@ -22,8 +22,8 @@ pcn_sheet <- 'PCNDetails'
 
 # * 1.4. Postcode data ----
 # The postcode file is in a zipfile and we will use the ONSPD_MAY_2023_UK.csv file in the Data sub-directory
-postcode_zipfile <- './data/ONSPD_MAY_2023_UK.zip'
-postcode_file <- 'Data/ONSPD_MAY_2023_UK.csv'
+postcode_zipfile <- './data/ONSPD_NOV_2023_UK.zip'
+postcode_file <- 'Data/ONSPD_NOV_2023_UK.csv'
 
 # 2. Read data ----
 
@@ -115,5 +115,12 @@ df_pcn_catchment <- df_pcn_catchment %>%
 
 # 4. Write Results ----
 
-save(file = 'practice_pcn_catchment_data.RObj', list = c('df_prac_catchment', 'df_pcn_catchment', 'df_lu'))
+save(file = './output/practice_pcn_catchment_data.RObj', list = c('df_prac_catchment', 'df_pcn_catchment', 'df_lu'))
+
+dir.create('./output', showWarnings = FALSE)
+write.csv(df_prac_catchment, './output/prac_catchment.csv')
+write.csv(df_pcn_catchment, './output/pcn_catchment.csv')
+write.csv(df_lu, './output/lookup.csv')
+
+
 
