@@ -1,3 +1,5 @@
+# 0. Load libraries and define functions ----
+# ═══════════════════════════════════════════
 library(tidyverse)
 library(readxl)
 library(sf)
@@ -61,15 +63,15 @@ postcode_file <- 'Data/ONSPD_FEB_2024_UK.csv'
 
 # * 1.5. LSOA 2011 to LSOA 2021 lookup data ----
 # ──────────────────────────────────────────────
-lsoa11_lsoa21_lu_file <- './data/LSOA11_LSOA21_LAD22_LU.csv'
+lsoa11_lsoa21_lu_file <- './data/LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Lookup_for_England_and_Wales_(Version_2).csv'
 
 # * 1.6. OA to LSOA to MSOA lookup data ----
 # ──────────────────────────────────────────
 # * * 1.6.1 LSOA to MSOA 2011 ----
-oa11_lsoa11_msoa11_lu_file <- './data/OA11_LSOA11_MSOA11_LAD11_LU.csv'
+oa11_lsoa11_msoa11_lu_file <- './data/Output_Area_to_Lower_layer_Super_Output_Area_to_Middle_layer_Super_Output_Area_to_Local_Authority_District_(December_2011)_Lookup_in_England_and_Wales.csv'
 
 # * * 1.6.2 LSOA to MSOA 2021 ----
-oa21_lsoa21_msoa21_lu_file <- './data/OA21_LSOA21_MSOA21_LAD22_LU.csv'
+oa21_lsoa21_msoa21_lu_file <- './data/Output_Area_to_Lower_layer_Super_Output_Area_to_Middle_layer_Super_Output_Area_to_Local_Authority_District_(December_2021)_Lookup_in_England_and_Wales_v3.csv'
 
 # 2. Read data ----
 # ═════════════════
@@ -112,8 +114,19 @@ df_postcode <- read.csv(unzip(zipfile = postcode_zipfile, files = postcode_file,
 # ──────────────────────────────────────────────
 df_lsoa11_lsoa21_lu <- read.csv(lsoa11_lsoa21_lu_file) %>% 
   select(LSOA11CD, LSOA21CD, CHGIND) %>%
-  # Ignore entries with XD as they are essentially deleted
-  filter(CHGIND!='XD')
+    # Delete the following X (complex) changes as they are very small 
+    # overlaps that can be ignored
+    filter(
+      !(
+        CHGIND == 'X' & 
+        (
+          (LSOA11CD == 'E01027506' & LSOA21CD == 'E01035624') |
+          (LSOA11CD == 'E01008187' & LSOA21CD == 'E01035637') |
+          (LSOA11CD == 'E01023964' & LSOA21CD == 'E01035581') |
+          (LSOA11CD == 'E01023508' & LSOA21CD == 'E01035582')
+        )
+      )
+    )
 
 # Calculate the factor that we will multiply the population by to
 # convert from 2011 into 2021 or vice versa

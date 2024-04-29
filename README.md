@@ -2,7 +2,7 @@
 
 #### Author: Richard Blackwell
 #### Email: richard.blackwell@swahsn.com
-#### Date: 2023-08-15
+#### Date: 2024-04-29
 
 ----
 
@@ -24,7 +24,7 @@ Source: [NHS Digital](https://digital.nhs.uk/)
 
 Landing Page: [Patients Registered at a GP Practice](https://digital.nhs.uk/data-and-information/publications/statistical/patients-registered-at-a-gp-practice)
 
-Example Data: [July 2023 data](https://files.digital.nhs.uk/E3/7F080B/gp-reg-pat-prac-lsoa-male-female-July-23.zip)
+Example Data: [April 2024 data](https://files.digital.nhs.uk/5C/704155/gp-reg-pat-prac-lsoa-male-female-Apr-24.zip)
 
 Notes: Data consists of the number of patients registered at each practice by lower-layer super output area (LSOA) 2011
 
@@ -34,7 +34,7 @@ Source: [NHS Digital](https://digital.nhs.uk/)
 
 Landing Page: [Patients Registered at a GP Practice](https://digital.nhs.uk/data-and-information/publications/statistical/patients-registered-at-a-gp-practice)
 
-Example Data: [July 2023 data](https://files.digital.nhs.uk/2C/59030E/gp-reg-pat-prac-map.csv)
+Example Data: [April 2024 data](https://files.digital.nhs.uk/31/A5EE4A/gp-reg-pat-prac-map.zip)
 
 Notes: Data consists of the a mapping of practice to parent PCN, to parent sub-ICB (prev. CCG), to parent ICB, to parent NSH England region
 
@@ -44,7 +44,7 @@ Source: [NHS Digital](https://digital.nhs.uk/)
 
 Landing Page: [GP and GP practice related data](https://digital.nhs.uk/services/organisation-data-service/export-data-files/csv-downloads/gp-and-gp-practice-related-data)
 
-Example Data: [July 2023 data](https://digital.nhs.uk/binaries/content/assets/website-assets/services/ods/data-downloads-other-nhs-organisations/epcn.zip)
+Example Data: [April 2024 data](https://digital.nhs.uk/binaries/content/assets/website-assets/services/ods/data-downloads-other-nhs-organisations/epcn.zip)
 
 Notes: Data contains the postcode of the lead practice for each PCN for geocoding
 
@@ -52,17 +52,39 @@ Notes: Data contains the postcode of the lead practice for each PCN for geocodin
 
 Source: [Office for National Statistics](https://geoportal.statistics.gov.uk/)
 
-Landing Page: [ONS Postcode Directory](https://geoportal.statistics.gov.uk/search?collection=Dataset&sort=-created&tags=all(PRD_ONSPD%2CMAY_2023))
+Landing Page: [ONS Postcode Directory](https://geoportal.statistics.gov.uk/search?q=PRD_ONSPD%20FEB_2024&sort=Date%20Created%7Ccreated%7Cdesc)
 
-Example Data: [May 2023 data](https://geoportal.statistics.gov.uk/datasets/ons-postcode-directory-may-2023)
+Example Data: [April 2024 data](https://www.arcgis.com/sharing/rest/content/items/e14b1475ecf74b58804cf667b6740706/data)
 
 Notes: Data contains the latitude and longitude of postcode centroid for geocoding along with the corresponding output area (OA) and lower-layer super output area (LSOA) for 2011 and 2021 mapping.
+
+### OA to LSOA to MSOA Lookup data
+
+Source: [Office for National Statistics](https://geoportal.statistics.gov.uk/)
+
+Landing Page: [ONS Census Lookups Directory](https://geoportal.statistics.gov.uk/search?q=LUP_OA&sort=Date%20Created%7Ccreated%7Cdesc)
+
+Example Data: [2011 data](https://geoportal.statistics.gov.uk/datasets/d382604321554ed49cc15dbc1edb3de3_0/explore)
+
+Example Data: [2021 data](https://geoportal.statistics.gov.uk/datasets/b9ca90c10aaa4b8d9791e9859a38ca67_0/explore)
+
+Notes: Data contains the lookup between output area (OA) and lower-layer super output area (LSOA) and middle-layer super output area (MSOA) for 2011 and 2021 areas.
+
+### LSOA11 to LSOA21 Lookup data
+
+Source: [Office for National Statistics](https://geoportal.statistics.gov.uk/)
+
+Landing Page: [ONS Census Best-fit Lookups Directory](https://geoportal.statistics.gov.uk/search?q=LUP_LSOA_2021_LAD&sort=Date%20Created%7Ccreated%7Cdesc)
+
+Example Data: [2011 to 2021](https://geoportal.statistics.gov.uk/datasets/e99a92fb7607495689f2eeeab8108fd6_0/explore)
+
+Notes: Data contains the lookup between lower-layer super output area (LSOA) 2011 to 2021.
 
 ----
 
 ## Methodology
 
-### Practice catchment area
+### Catchment area data
 
 The `gp-reg-pat-prac-lsoa-all.csv` file is extracted from the GP registration data zip file and the data consists of the following fields
 
@@ -76,29 +98,19 @@ The `gp-reg-pat-prac-lsoa-all.csv` file is extracted from the GP registration da
 
 The data is filtered by entries that have an `LSOA_CODE` that begins with **E** signifying an English LSOA (excluding patients from unknown LSOAs and also those residing in Wales) and only the `PRACTICE_CODE`, `LSOA_CODE` and `NUMBER_OF_PATIENTS` fields are used.
 
-This data is grouped by `LSOA_CODE` and the `TOTAL_REGISTERED_PATIENTS` for the LSOA is calculated as the sum of all patients from that LSOA registered with any practice.
+The `LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Lookup_for_England_and_Wales_(Version_2).csv` lookup file is then used to add in the LSOA 2021 code and the factor that will used to transform the 2011 LSOA population into a 2021 LSOA population. In this situtation this factor is only relevant for those 2011 LSOAs that have been split into a number of new 2021 LSOAs and the factor is 1/N where N is the number of new 2011 LSOAs, for example if a 2011 LSOA was split into 4 new 2021 LSOAs the factor would be 1/4 and would multiply the 2011 LSOA population by the factor 0.25 to obtain the new 2021 LSOA population.
 
-This grouped data is combined with the practice level data to obtain a data set consisting of `PRACTICE_CODE`, `LSOA_CODE`, `NUMBER_OF_PATIENTS` and `TOTAL_REGISTERED_PATIENTS`. The `PCT_REGISTERED_PATIENTS` field is calculated as the `NUMBER_OF_PATIENTS` divided by the `TOTAL_REGISTERED_PATIENTS`.
+The files `Output_Area_to_Lower_layer_Super_Output_Area_to_Middle_layer_Super_Output_Area_to_Local_Authority_District_(December_2011)_Lookup_in_England_and_Wales.csv` and `Output_Area_to_Lower_layer_Super_Output_Area_to_Middle_layer_Super_Output_Area_to_Local_Authority_District_(December_2021)_Lookup_in_England_and_Wales_v3.csv` are used to add the corresponding MSOAs (2011 and 2021).
 
-### PCN catchment area
+The file `gp-reg-pat-prac-map.csv` is then used to add the Primary Care Network (PCN) code corresponding to the practiceto the data. The data is then standardised and pivoted longer to form a data frame consisting of 
 
-The `gp-reg-pat-prac-lsoa-all.csv` file is extracted from the GP registration data zip file and the data consists of the following fields
+ - `ORG_CODE` - practice or PCN code
+ - `ORG_TYPE` - 'PRAC' or 'PCN'
+ - `AREA_CODE` - LSOA or MSOA code (2011 or 2021)
+ - `AREA_TYPE` - 'LSOA11', 'LSOA21', 'MSOA11' or 'MSOA21'
+ - `REG_POPN` - registered population
 
- - `PUBLICATION` - the name of the publication (**GP_PRAC_PAT_LIST**)
- - `EXTRACT_DATE` -  the extract date
- - `PRACTICE_CODE` - the GP practice code
- - `PRACTICE_NAME` - the GP practice name
- - `LSOA_CODE` - the lower-layer super output area (LSOA) 2011 code
- - `SEX` - the gender of the patient (**ALL**)
- - `NUMBER_OF_PATIENTS` - the number of registered patients
-
-The data is filtered by entries that have an `LSOA_CODE` that begins with **E** signifying an English LSOA (excluding patients from unknown LSOAs and also those residing in Wales) and only the `PRACTICE_CODE`, `LSOA_CODE` and `NUMBER_OF_PATIENTS` fields are used.
-
-This data is joined to the Practice, PCN, Sub-ICB, ICB, NHSE Region lookup data to get the `PCN_CODE` for each `PRACTICE_CODE`. This data is then grouped by `PCN_CODE` and `LSOA_CODE` and the `NUMBER_OF_PATIENTS` summed to obtain the `NUMBER_OF_PATIENTS` by PCN.
-
-This data is grouped by `LSOA_CODE` and the `TOTAL_REGISTERED_PATIENTS` for the LSOA is calculated as the sum of all patients from that LSOA registered with any PCN (and also those practices not members of any PCN, U - unallocated).
-
-This grouped data is combined with the PCN level data to obtain a data set consisting of `PCN_CODE`, `LSOA_CODE`, `NUMBER_OF_PATIENTS` and `TOTAL_REGISTERED_PATIENTS`. The `PCT_REGISTERED_PATIENTS` field is calculated as the `NUMBER_OF_PATIENTS` divided by the `TOTAL_REGISTERED_PATIENTS`.
+The `PCT` is calculated as the `REG_POPN` divided by the `TOTAL_POPN` which is the sum of the `REG_POPN` for that `AREA_CODE`
 
 ### Geocoding data
 
@@ -157,29 +169,31 @@ This is then joined to the mapping data by the practice postcode and the PCN pos
 
 The output consists of 3 data frames
 
-### Practice catchment
+### Catchment data
 
-The data frame name is `df_prac_catchment` and this provides the proportion of each LSOA's registered population by practice and the fields are as follows
+The data frame name is `df_catchment_data` and this provides the proportion of each `AREA_CODE`'s registered population by `ORG_CODE` and the fields are as follows
 
- - `PRAC_CODE` - practice code
- - `LSOA11CD` - LSOA 2011 code
+ - `ORG_CODE` - organisation code (practice or PCN)
+ - `ORG_TYPE` - organisation type ('PRAC' or 'PCN')
+ - `AREA_CODE` - census area
+ - `AREA_TYPE` - census area type ('LSOA11', 'LSOA21', 'MSOA11' or 'MSOA21')
  - `REG_POPN` - registered population
- - `TOTAL_REG_POPN` - total registered population for LSOA
+ - `TOTAL_REG_POPN` - total registered population for census area
  - `PCT` - registered population as proportion of total registered population
 
-### PCN catchment
+### LSOA 2011 to LSOA 2021 Lookup
 
-The data frame name is `df_pcn_catchment` and this provides the proportion of each LSOA's registered population by PCN and the fields are as follows
+The data frame name is `df_lsoa11_lsoa21_lu` and this provides the mapping between 2011 and 2021 LSOAs and the factor that should be used to convert the population from 2011 to 2021  `FCT_11_21` or to convert the population from 2021 to 2011 `FCT_21_11` and the fields are as follows
 
- - `PCN_CODE` - PCN code
  - `LSOA11CD` - LSOA 2011 code
- - `REG_POPN` - registered population
- - `TOTAL_REG_POPN` - total registered population for LSOA
- - `PCT` - registered population as proportion of total registered population
+ - `LSOA21CD` - LSOA 2021 code
+ - `CHGIND` - Change indicator from 2011 to 2021 LSOAs (U - unchanged, S - split, M - Merged, X - complex)
+ - `FCT_11_21` - factor used to convert population from 2011 to 2021 areas
+ - `FCT_21_11` - factor used to convert population from 2021 to 2011 areas
 
-### Lookup
+### Geocoded Lookup
 
-The data frame name is `df_lu` and this provides the lookup data for each practice and 
+The data frame name is `df_geocoded_lu` and this provides the lookup data for each practice and 
 
  - `PRAC_CODE` - the GP practice code
  - `PRAC_NAME` - the GP practice name
