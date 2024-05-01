@@ -85,7 +85,7 @@ df_reg_popn <- read.csv(unzip(zipfile = gp_registration_zipfile, files = gp_regi
   filter(grepl('^E', LSOA_CODE)) %>%
   mutate(PRAC_CODE = PRACTICE_CODE,
          LSOA11CD = LSOA_CODE,
-         REG_POPN_LSOA11 = NUMBER_OF_PATIENTS,
+         REG_POPN = NUMBER_OF_PATIENTS,
          .keep = 'none')
 
 # * 2.2. Lookup data ----
@@ -197,7 +197,7 @@ df_reg_popn <- df_reg_popn %>%
     df_lsoa11_lsoa21_lu,
     by = 'LSOA11CD',
     relationship = 'many-to-many') %>% 
-  mutate(REG_POPN_LSOA21 = REG_POPN_LSOA11 * FCT_11_21) %>%
+  mutate(REG_POPN = REG_POPN * FCT_11_21) %>%
   # Add in MSOA 2011
   left_join(df_oa11_lsoa11_msoa11_lu %>% distinct(LSOA11CD, MSOA11CD),
             by = 'LSOA11CD') %>%
@@ -206,16 +206,16 @@ df_reg_popn <- df_reg_popn %>%
             by = 'LSOA21CD') %>%
   # Add in PCN
   left_join(df_geocoded_lu %>% distinct(PRAC_CODE, PCN_CODE),
-            by = 'PRAC_CODE') %>%
+            by = 'PRAC_CODE') %>% 
   # Select only the relevant fields
-  select(1, 11, 2, 9, 4, 10, 3, 8)
+  select(1, 10, 2, 8, 4, 9, 3)
 
 # * * 3.2.1. Practice and LSOA ----
 df_catchment_data <- fnCreateCatchmentData(
   df = df_reg_popn %>% 
     mutate(ORG_CODE = PRAC_CODE, 
            AREA_CODE = LSOA11CD, 
-           REG_POPN = REG_POPN_LSOA11,
+           REG_POPN,
            .keep = 'none'),
   org_type = 'PRAC',
   area_type = 'LSOA11')
@@ -227,7 +227,7 @@ df_catchment_data <- df_catchment_data %>%
       df = df_reg_popn %>% 
         mutate(ORG_CODE = PRAC_CODE, 
         AREA_CODE = LSOA21CD, 
-        REG_POPN = REG_POPN_LSOA21,
+        REG_POPN = REG_POPN,
         .keep = 'none'),
       org_type = 'PRAC',
       area_type = 'LSOA21'))
@@ -240,7 +240,7 @@ df_catchment_data <- df_catchment_data %>%
       df = df_reg_popn %>% 
         mutate(ORG_CODE = PRAC_CODE, 
                AREA_CODE = MSOA11CD, 
-               REG_POPN = REG_POPN_LSOA11,
+               REG_POPN,
                .keep = 'none'),
       org_type = 'PRAC',
       area_type = 'MSOA11'))
@@ -252,7 +252,7 @@ df_catchment_data <- df_catchment_data %>%
       df = df_reg_popn %>% 
         mutate(ORG_CODE = PRAC_CODE, 
         AREA_CODE = MSOA21CD, 
-        REG_POPN = REG_POPN_LSOA21,
+        REG_POPN,
         .keep = 'none'),
       org_type = 'PRAC',
       area_type = 'MSOA21'))
@@ -265,7 +265,7 @@ df_catchment_data <- df_catchment_data %>%
       df = df_reg_popn %>% 
         mutate(ORG_CODE = PCN_CODE, 
                AREA_CODE = LSOA11CD, 
-               REG_POPN = REG_POPN_LSOA11,
+               REG_POPN,
                .keep = 'none'),
       org_type = 'PCN',
       area_type = 'LSOA11'))
@@ -277,7 +277,7 @@ df_catchment_data <- df_catchment_data %>%
       df = df_reg_popn %>% 
         mutate(ORG_CODE = PCN_CODE, 
                AREA_CODE = LSOA21CD, 
-               REG_POPN = REG_POPN_LSOA21,
+               REG_POPN = REG_POPN,
                .keep = 'none'),
       org_type = 'PCN',
       area_type = 'LSOA21'))
@@ -290,7 +290,7 @@ df_catchment_data <- df_catchment_data %>%
       df = df_reg_popn %>% 
         mutate(ORG_CODE = PCN_CODE, 
                AREA_CODE = MSOA11CD, 
-               REG_POPN = REG_POPN_LSOA11,
+               REG_POPN = REG_POPN,
                .keep = 'none'),
       org_type = 'PCN',
       area_type = 'MSOA11'))
@@ -302,7 +302,7 @@ df_catchment_data <- df_catchment_data %>%
       df = df_reg_popn %>% 
         mutate(ORG_CODE = PCN_CODE, 
                AREA_CODE = MSOA21CD, 
-               REG_POPN = REG_POPN_LSOA21,
+               REG_POPN = REG_POPN,
                .keep = 'none'),
       org_type = 'PCN',
       area_type = 'MSOA21'))
